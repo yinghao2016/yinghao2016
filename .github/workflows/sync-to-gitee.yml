@@ -3,7 +3,7 @@ name: Sync blacklist to Gitee
 on:
   push:
     paths:
-      - 'banned_lic_comparefolder.txt'
+      - '**.txt'
   workflow_dispatch:   # 也允许手动触发
 
 jobs:
