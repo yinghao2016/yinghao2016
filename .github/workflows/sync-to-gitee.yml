@@ -1,0 +1,31 @@
+name: Sync blacklist to Gitee
+
+on:
+  push:
+    paths:
+      - 'banned_lic_comparefolder.txt'
+  workflow_dispatch:   # 也允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          GITEE_USERNAME: ${{ secrets.GITEE_USERNAME }}
+          GITEE_REPO: ${{ secrets.GITEE_REPO }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # 把 Gitee 加为远程，直接推过去
+          git remote add gitee https://${GITEE_USERNAME}:${GITEE_TOKEN}@gitee.com/${GITEE_REPO}.git
+
+          # 强制推送到 Gitee 的 master 分支（黑名单文件是单向同步，覆盖即可）
+          git push gitee HEAD:master --force
